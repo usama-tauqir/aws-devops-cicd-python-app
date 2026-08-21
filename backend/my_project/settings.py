@@ -15,7 +15,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 # Load environment variables
-load_dotenv()
+load_dotenv(override=True)
 
 
 # SECURITY WARNING: keep the secret key used in production secret!
@@ -122,23 +122,14 @@ WSGI_APPLICATION = 'my_project.wsgi.application'
 # =====================================================
 
 DATABASES = {
-
     "default": {
-
         "ENGINE": "django.db.backends.postgresql",
-
         "NAME": os.getenv("DB_NAME"),
-
         "USER": os.getenv("DB_USER"),
-
         "PASSWORD": os.getenv("DB_PASSWORD"),
-
         "HOST": os.getenv("DB_HOST"),
-
         "PORT": os.getenv("DB_PORT"),
-
     }
-
 }
 
 
