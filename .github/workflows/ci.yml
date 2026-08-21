@@ -18,6 +18,7 @@ jobs:
 
     runs-on: ubuntu-latest
 
+
     services:
 
       postgres:
@@ -46,23 +47,19 @@ jobs:
 
       - name: Setup Python
         uses: actions/setup-python@v5
-
         with:
           python-version: "3.9"
 
 
       - name: Install backend dependencies
         working-directory: backend
-
         run: |
           pip install --upgrade pip
           pip install -r requirements.txt
 
 
       - name: Run Django migrations
-
         working-directory: backend
-
         env:
           DB_NAME: ecommerce_db
           DB_USER: ecommerce_user
@@ -75,8 +72,13 @@ jobs:
 
 
       - name: Run Django tests
-
         working-directory: backend
+        env:
+          DB_NAME: ecommerce_db
+          DB_USER: ecommerce_user
+          DB_PASSWORD: ecommerce_password
+          DB_HOST: localhost
+          DB_PORT: 5432
 
         run: |
           python manage.py test
@@ -97,25 +99,25 @@ jobs:
 
 
       - name: Setup Node
-
         uses: actions/setup-node@v4
-
         with:
           node-version: "16"
 
 
       - name: Install frontend dependencies
-
         working-directory: frontend
-
         run: |
-          npm install
+          npm ci
+
+
+      - name: Fix react-scripts permission
+        working-directory: frontend
+        run: |
+          chmod +x node_modules/.bin/react-scripts
 
 
       - name: Build React application
-
         working-directory: frontend
-
         run: |
           npm run build
 
@@ -136,17 +138,14 @@ jobs:
     steps:
 
       - name: Checkout code
-
         uses: actions/checkout@v4
 
 
       - name: Build backend image
-
         run: |
           docker build -t ecommerce-backend ./backend
 
 
       - name: Build frontend image
-
         run: |
           docker build -t ecommerce-frontend ./frontend
