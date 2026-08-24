@@ -23,9 +23,12 @@ pipeline {
 
         AWS_CREDENTIALS = "aws-ecr-creds"
 
+
         EC2_KEY = "ec2-ssh-key"
 
+
         EC2_USER = "ubuntu"
+
 
         EC2_HOST = "YOUR_EC2_PUBLIC_IP"
 
@@ -60,43 +63,64 @@ pipeline {
 
 
 
-        stage('Backend Test') {
+        stage('Check Tools') {
 
-            agent {
+            steps {
 
-                docker {
+                sh '''
 
-                    image 'python:3.9-slim'
+                echo "Checking installed tools..."
 
-                    reuseNode true
+                docker --version
 
-                }
+                python --version || true
+
+                node --version || true
+
+                aws --version || true
+
+
+                '''
+
             }
+        }
+
+
+
+
+        stage('Backend Test') {
 
 
             steps {
 
-                dir('backend') {
+
+                sh '''
+
+                cd backend
 
 
-                    sh '''
-
-                    pip install --upgrade pip
-
-                    pip install -r requirements.txt
+                python --version
 
 
-                    python manage.py check
+                pip install --upgrade pip
 
 
-                    python manage.py test
+                pip install -r requirements.txt
 
 
-                    '''
+                python manage.py check
 
-                }
+
+                python manage.py test
+
+
+                '''
+
+
             }
+
         }
+
 
 
 
@@ -104,34 +128,30 @@ pipeline {
         stage('Frontend Build Test') {
 
 
-            agent {
-
-                docker {
-
-                    image 'node:16-alpine'
-
-                    reuseNode true
-
-                }
-            }
-
-
             steps {
 
-                dir('frontend') {
+
+                sh '''
+
+                cd frontend
 
 
-                    sh '''
+                npm --version
 
-                    npm install
 
-                    npm run build
+                npm install
 
-                    '''
 
-                }
+                npm run build
+
+
+                '''
+
+
             }
+
         }
+
 
 
 
@@ -144,10 +164,16 @@ pipeline {
 
                 sh '''
 
+                echo "Building backend image..."
+
+
                 docker build \
                 -t ${BACKEND_IMAGE}:${IMAGE_TAG} \
                 ./backend
 
+
+
+                echo "Building frontend image..."
 
 
                 docker build \
@@ -180,6 +206,9 @@ pipeline {
 
                     sh '''
 
+                    echo "Logging into AWS ECR..."
+
+
                     aws ecr get-login-password \
                     --region ${AWS_REGION} | \
                     docker login \
@@ -208,10 +237,17 @@ pipeline {
 
                 sh '''
 
+                echo "Pushing images..."
+
+
                 docker push ${BACKEND_IMAGE}:${IMAGE_TAG}
+
 
                 docker push ${FRONTEND_IMAGE}:${IMAGE_TAG}
 
+
+
+                echo "Creating latest tags..."
 
 
                 docker tag \
@@ -228,7 +264,9 @@ pipeline {
 
                 docker push ${BACKEND_IMAGE}:latest
 
+
                 docker push ${FRONTEND_IMAGE}:latest
+
 
 
                 '''
@@ -254,13 +292,25 @@ pipeline {
 
                     sh """
 
-
                     ssh -o StrictHostKeyChecking=no \
                     ${EC2_USER}@${EC2_HOST} << EOF
 
 
+
+                    echo "Logging into ECR"
+
+
+
+                    aws ecr get-login-password \
+                    --region ${AWS_REGION} | \
                     docker login \
+                    --username AWS \
+                    --password-stdin \
                     ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
+
+
+
+                    echo "Pulling latest images"
 
 
 
@@ -274,7 +324,9 @@ pipeline {
 
 
 
+
                     cd ecommerce-project
+
 
 
 
@@ -282,7 +334,13 @@ pipeline {
 
 
 
+
                     docker compose up -d
+
+
+
+
+                    echo "Deployment completed"
 
 
 
@@ -294,9 +352,7 @@ EOF
 
                     """
 
-
                 }
-
 
             }
 
@@ -304,7 +360,6 @@ EOF
 
 
     }
-
 
 
 
@@ -317,19 +372,20 @@ EOF
 
             echo """
 
-            =========================
+            =============================
 
             PIPELINE SUCCESSFUL
 
-            Images pushed to AWS ECR
+            Docker images pushed to ECR
 
-            Application deployed
+            Application deployed on EC2
 
-            =========================
+            =============================
 
             """
 
         }
+
 
 
 
@@ -338,13 +394,31 @@ EOF
 
             echo """
 
-            =========================
+            =============================
 
             PIPELINE FAILED
 
-            Check Jenkins logs
+            Check Jenkins console logs
 
-            =========================
+            =============================
+
+            """
+
+        }
+
+
+
+
+        always {
+
+
+            echo """
+
+            Build Number:
+            ${BUILD_NUMBER}
+
+            Status:
+            ${currentBuild.currentResult}
 
             """
 
@@ -352,5 +426,6 @@ EOF
 
 
     }
+
 
 }
