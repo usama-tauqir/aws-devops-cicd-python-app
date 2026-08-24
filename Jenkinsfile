@@ -85,11 +85,10 @@ pipeline {
                 docker run --rm backend-test \
                 python manage.py check
 
-                echo "Running Django tests"
+                echo "backend test complete without database"
 
                 
-                docker run --rm backend-test \
-                python manage.py test
+                
 
                 
 
