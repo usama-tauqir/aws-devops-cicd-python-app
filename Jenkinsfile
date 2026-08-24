@@ -45,6 +45,7 @@ pipeline {
                 numToKeepStr: '20'
             )
         )
+
     }
 
 
@@ -59,32 +60,8 @@ pipeline {
                 checkout scm
 
             }
+
         }
-
-
-
-        stage('Check Tools') {
-
-            steps {
-
-                sh '''
-
-                echo "Checking installed tools..."
-
-                docker --version
-
-                python --version || true
-
-                node --version || true
-
-                aws --version || true
-
-
-                '''
-
-            }
-        }
-
 
 
 
@@ -96,31 +73,28 @@ pipeline {
 
                 sh '''
 
-                cd backend
+                echo "Running Django tests..."
 
 
-                python --version
+                docker run --rm \
+                -v $(pwd)/backend:/app \
+                -w /app \
+                python:3.9-slim \
+                bash -c "
 
-
-                pip install --upgrade pip
-
-
-                pip install -r requirements.txt
-
-
-                python manage.py check
-
-
+                pip install --upgrade pip &&
+                pip install -r requirements.txt &&
+                python manage.py check &&
                 python manage.py test
+
+                "
 
 
                 '''
 
-
             }
 
         }
-
 
 
 
@@ -133,20 +107,22 @@ pipeline {
 
                 sh '''
 
-                cd frontend
+                echo "Running React build..."
 
 
-                npm --version
+                docker run --rm \
+                -v $(pwd)/frontend:/app \
+                -w /app \
+                node:16-alpine \
+                sh -c "
 
-
-                npm install
-
-
+                npm install &&
                 npm run build
+
+                "
 
 
                 '''
-
 
             }
 
@@ -164,7 +140,7 @@ pipeline {
 
                 sh '''
 
-                echo "Building backend image..."
+                echo "Building Backend Docker Image"
 
 
                 docker build \
@@ -173,13 +149,12 @@ pipeline {
 
 
 
-                echo "Building frontend image..."
+                echo "Building Frontend Docker Image"
 
 
                 docker build \
                 -t ${FRONTEND_IMAGE}:${IMAGE_TAG} \
                 ./frontend
-
 
 
                 '''
@@ -206,7 +181,7 @@ pipeline {
 
                     sh '''
 
-                    echo "Logging into AWS ECR..."
+                    echo "Logging into AWS ECR"
 
 
                     aws ecr get-login-password \
@@ -237,17 +212,23 @@ pipeline {
 
                 sh '''
 
-                echo "Pushing images..."
+                echo "Pushing backend image"
 
 
                 docker push ${BACKEND_IMAGE}:${IMAGE_TAG}
+
+
+
+                echo "Pushing frontend image"
 
 
                 docker push ${FRONTEND_IMAGE}:${IMAGE_TAG}
 
 
 
-                echo "Creating latest tags..."
+
+                echo "Creating latest tags"
+
 
 
                 docker tag \
@@ -259,6 +240,7 @@ pipeline {
                 docker tag \
                 ${FRONTEND_IMAGE}:${IMAGE_TAG} \
                 ${FRONTEND_IMAGE}:latest
+
 
 
 
@@ -292,12 +274,17 @@ pipeline {
 
                     sh """
 
+
+                    echo "Connecting to EC2"
+
+
+
                     ssh -o StrictHostKeyChecking=no \
                     ${EC2_USER}@${EC2_HOST} << EOF
 
 
 
-                    echo "Logging into ECR"
+                    echo "Login into AWS ECR"
 
 
 
@@ -307,6 +294,7 @@ pipeline {
                     --username AWS \
                     --password-stdin \
                     ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
+
 
 
 
@@ -364,6 +352,7 @@ EOF
 
 
 
+
     post {
 
 
@@ -376,7 +365,7 @@ EOF
 
             PIPELINE SUCCESSFUL
 
-            Docker images pushed to ECR
+            Images pushed to AWS ECR
 
             Application deployed on EC2
 
@@ -405,7 +394,6 @@ EOF
             """
 
         }
-
 
 
 
