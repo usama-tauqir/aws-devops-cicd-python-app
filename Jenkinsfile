@@ -112,13 +112,11 @@ pipeline {
 
                 echo "Building frontend test image"
 
-                docker run --rm \
-                -v $(pwd)/frontend:/app \
-                -w /app \
-                node:16-alpine \
-                sh -c "
-                npm install &&
-                npm run build
+                docker build \
+                -t frontend-test \
+                ./frontend
+                
+                echo "frontend build complete"
 
                 "
                 
