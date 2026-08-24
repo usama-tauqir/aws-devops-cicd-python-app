@@ -73,21 +73,25 @@ pipeline {
 
                 sh '''
 
-                echo "Running Django tests..."
+                echo "Building backend test image"
 
 
-                docker run --rm \
-                -v $(pwd)/backend:/app \
-                -w /app \
-                python:3.9-slim \
-                bash -c "
+                docker build \
+                -t backend-test \
+                ./backend
+                
+                echo "Running Django tests"
 
-                pip install --upgrade pip &&
-                pip install -r requirements.txt &&
-                python manage.py check &&
+                docker run --rm backend-test \
+                python manage.py check
+
+                echo "Running Django tests"
+
+                
+                docker run --rm backend-test \
                 python manage.py test
 
-                "
+                
 
 
                 '''
@@ -107,19 +111,20 @@ pipeline {
 
                 sh '''
 
-                echo "Running React build..."
-
+                echo "Building frontend test image"
 
                 docker run --rm \
                 -v $(pwd)/frontend:/app \
                 -w /app \
                 node:16-alpine \
                 sh -c "
-
                 npm install &&
                 npm run build
 
                 "
+                
+
+                
 
 
                 '''
