@@ -118,7 +118,7 @@ pipeline {
                 
                 echo "frontend build complete"
 
-                "
+                
                 
 
                 
