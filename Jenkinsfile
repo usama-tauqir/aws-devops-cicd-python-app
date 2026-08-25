@@ -4,8 +4,10 @@ pipeline {
     environment {
         AWS_REGION = "ap-south-1"
         AWS_ACCOUNT_ID = "096942125249"
-        // IMPORTANT: Use the exact credential ID from Jenkins
-        AWS_CREDENTIALS = "aws-ecr-credits"  // Verify this is exactly as in Jenkins
+        
+        // IMPORTANT: Changed from "aws-ecr-creds" to match your Jenkins credential name "aws-ecr-credits"
+        AWS_CREDENTIALS = "aws-ecr-credits"
+        
         BACKEND_IMAGE = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/ecommerce-backend"
         FRONTEND_IMAGE = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/ecommerce-frontend"
         IMAGE_TAG = "${BUILD_NUMBER}"
@@ -50,14 +52,14 @@ pipeline {
 
         stage('Create ECR Repositories') {
             steps {
-                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: "${env.AWS_CREDENTIALS}"]]){
+                withAWS(credentials: "${AWS_CREDENTIALS}", region: "${AWS_REGION}") {
                     sh """
                         echo "Creating ECR repositories if they don't exist"
-                        aws ecr describe-repositories --repository-names ecommerce-backend --region ${AWS_REGION} 2>/dev/null || \
-                        aws ecr create-repository --repository-name ecommerce-backend --region ${AWS_REGION}
+                        aws ecr describe-repositories --repository-names ecommerce-backend 2>/dev/null || \
+                        aws ecr create-repository --repository-name ecommerce-backend
                         
-                        aws ecr describe-repositories --repository-names ecommerce-frontend --region ${AWS_REGION} 2>/dev/null || \
-                        aws ecr create-repository --repository-name ecommerce-frontend --region ${AWS_REGION}
+                        aws ecr describe-repositories --repository-names ecommerce-frontend 2>/dev/null || \
+                        aws ecr create-repository --repository-name ecommerce-frontend
                     """
                 }
             }
@@ -77,7 +79,7 @@ pipeline {
 
         stage('Login AWS ECR') {
             steps {
-                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: "${env.AWS_CREDENTIALS}"]]){
+                withAWS(credentials: "${AWS_CREDENTIALS}", region: "${AWS_REGION}") {
                     sh """
                         echo "Logging into AWS ECR"
                         aws ecr get-login-password --region ${AWS_REGION} | \
