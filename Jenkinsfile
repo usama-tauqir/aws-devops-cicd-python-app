@@ -127,7 +127,7 @@ pipeline {
 
                     sh '''
 
-                    ssh -o StrictHostKeyChecking=no -i $SSH_KEY ubuntu@43.204.214.232 << EOF
+                    ssh -o StrictHostKeyChecking=no -i $SSH_KEY ubuntu@43.204.214.232 'bash -s' << EOF
 
 
                     set -e
@@ -204,20 +204,8 @@ pipeline {
 
 
                     echo "Checking containers"
-
-
-
                     docker ps
-
-
-
-
-
-
                     echo "=== Deployment Completed Successfully ==="
-
-
-
                     EOF
 
                     '''
