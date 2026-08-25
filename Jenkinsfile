@@ -51,7 +51,7 @@ pipeline {
             steps {
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: "${AWS_CREDENTIALS}"]]) {
                     sh """
-                        echo "Creating ECR repositories if they don't exist"
+                        echo "Checking ECR repositories"
                         
                         if aws ecr describe-repositories --repository-names ecommerce-backend --region ${AWS_REGION} 2>&1 | grep -q "RepositoryNotFoundException"; then
                             echo "Creating ecommerce-backend repository"
@@ -116,30 +116,39 @@ pipeline {
 
         stage('Deploy To EC2') {
             steps {
-                sshagent(credentials: ["${EC2_KEY}"]) {
+                withCredentials([sshUserPrivateKey(
+                    credentialsId: "${EC2_KEY}",
+                    keyFileVariable: 'SSH_KEY'
+                )]) {
                     sh """
-                        echo "Connecting to EC2"
+                        echo "Connecting to EC2 ${EC2_HOST}"
                         
-                        ssh -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_HOST} << 'EOF'
-                            echo "Login into AWS ECR"
-                            aws ecr get-login-password --region ${AWS_REGION} | \
-                            docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
+                        ssh -o StrictHostKeyChecking=no \
+                            -i \${SSH_KEY} \
+                            ${EC2_USER}@${EC2_HOST} << 'EOF'
+                                echo "=== Starting Deployment ==="
+                                
+                                echo "Login into AWS ECR"
+                                aws ecr get-login-password --region ${AWS_REGION} | \
+                                docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
 
-                            echo "Pulling latest images"
-                            docker pull ${BACKEND_IMAGE}:latest
-                            docker pull ${FRONTEND_IMAGE}:latest
+                                echo "Pulling latest images"
+                                docker pull ${BACKEND_IMAGE}:latest
+                                docker pull ${FRONTEND_IMAGE}:latest
 
-                            echo "Stopping old containers"
-                            docker stop \$(docker ps -q) 2>/dev/null || true
-                            docker rm \$(docker ps -aq) 2>/dev/null || true
+                                echo "Stopping old containers"
+                                docker stop \$(docker ps -q) 2>/dev/null || true
+                                docker rm \$(docker ps -aq) 2>/dev/null || true
 
-                            echo "Running backend container"
-                            docker run -d --name backend -p 8000:8000 ${BACKEND_IMAGE}:latest
+                                echo "Running backend container on port 8000"
+                                docker run -d --name backend -p 8000:8000 ${BACKEND_IMAGE}:latest
 
-                            echo "Running frontend container"
-                            docker run -d --name frontend -p 80:80 ${FRONTEND_IMAGE}:latest
+                                echo "Running frontend container on port 80"
+                                docker run -d --name frontend -p 80:80 ${FRONTEND_IMAGE}:latest
 
-                            echo "Deployment completed"
+                                echo "=== Deployment Completed Successfully ==="
+                                echo "Backend: http://${EC2_HOST}:8000"
+                                echo "Frontend: http://${EC2_HOST}"
 EOF
                     """
                 }
@@ -151,9 +160,11 @@ EOF
         success {
             echo """
                 =============================
-                PIPELINE SUCCESSFUL ✅
-                Images pushed to AWS ECR
-                Application deployed on EC2
+                🎉 PIPELINE SUCCESSFUL ✅
+                📦 Images pushed to AWS ECR
+                🚀 Application deployed on EC2
+                🌐 Backend: http://${EC2_HOST}:8000
+                🌐 Frontend: http://${EC2_HOST}
                 =============================
             """
         }
@@ -161,8 +172,8 @@ EOF
         failure {
             echo """
                 =============================
-                PIPELINE FAILED ❌
-                Check Jenkins console logs
+                ❌ PIPELINE FAILED
+                Please check Jenkins console logs
                 =============================
             """
         }
