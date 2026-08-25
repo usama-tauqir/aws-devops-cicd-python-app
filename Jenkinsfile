@@ -4,7 +4,7 @@ pipeline {
     environment {
         AWS_REGION = "ap-south-1"
         AWS_ACCOUNT_ID = "096942125249"
-        AWS_CREDENTIALS = "aws-ecr-credits"
+        AWS_CREDENTIALS = "aws-ecr-creds"
         BACKEND_IMAGE = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/ecommerce-backend"
         FRONTEND_IMAGE = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/ecommerce-frontend"
         IMAGE_TAG = "${BUILD_NUMBER}"
