@@ -126,20 +126,13 @@ pipeline {
                 ]) {
 
                     sh '''
-
-                    ssh -o StrictHostKeyChecking=no -i $SSH_KEY ubuntu@43.204.214.232 'bash -s' << EOF
-
+                    ssh -o StrictHostKeyChecking=no -i $SSH_KEY ubuntu@43.204.214.232 'bash -s' <<'REMOTE_SCRIPT'
 
                     set -e
 
-
                     echo "=== Starting Deployment ==="
 
-
-
                     echo "Login into AWS ECR"
-
-
 
                     aws ecr get-login-password \
                     --region ap-south-1 | \
@@ -149,21 +142,15 @@ pipeline {
                     096942125249.dkr.ecr.ap-south-1.amazonaws.com
 
 
-
-
-
                     echo "Stopping old containers"
 
                     docker rm -f ecommerce-backend || true
-
                     docker rm -f ecommerce-frontend || true
-
 
 
                     echo "Cleaning unused Docker resources"
 
                     docker system prune -af
-
 
 
                     echo "Pulling latest images"
@@ -173,11 +160,7 @@ pipeline {
                     docker pull 096942125249.dkr.ecr.ap-south-1.amazonaws.com/ecommerce-frontend:latest
 
 
-
-
-                    echo "Starting new backend container"
-
-
+                    echo "Starting backend"
 
                     docker run -d \
                     --name ecommerce-backend \
@@ -185,13 +168,7 @@ pipeline {
                     096942125249.dkr.ecr.ap-south-1.amazonaws.com/ecommerce-backend:latest
 
 
-
-
-
-
-                    echo "Starting new frontend container"
-
-
+                    echo "Starting frontend"
 
                     docker run -d \
                     --name ecommerce-frontend \
@@ -199,15 +176,14 @@ pipeline {
                     096942125249.dkr.ecr.ap-south-1.amazonaws.com/ecommerce-frontend:latest
 
 
-
-
-
-
                     echo "Checking containers"
-                    docker ps
-                    echo "=== Deployment Completed Successfully ==="
-                    EOF
 
+                    docker ps
+
+
+                    echo "=== Deployment Completed Successfully ==="
+
+                    REMOTE_SCRIPT
                     '''
 
                 }
