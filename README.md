@@ -1,205 +1,464 @@
-AWS | Docker | GitHub Actions/Jenkins | Linux | Nginx | Python
+# AWS DevOps CI/CD Project — Django + React E-Commerce
 
-Project Overview → Architecture → Tech Stack → CI/CD Workflow → AWS Deployment → Setup → Screenshots → Challenges → What I Learned
+A full-stack e-commerce application built with **Django** and **React**, packaged and deployed using a DevOps workflow centered on **AWS, Docker, CI/CD, Linux, Nginx, Git, and GitHub**.
 
+This repository is intended to showcase both the application itself and the DevOps practices used to build, deploy, and operate it.
 
-# FullStack_Ecommerce_App
-A FullStack Ecommerce App built with Django and React. 
-<p id ="top" align="center">
-  <img src="https://github.com/YashMarmat/Pages-App-django/blob/master/templates/ecommerce%20%20products%20list%20page.png?raw=true" width="100%">
-</p>
+---
 
-Checkout the site in action here <a href="https://condescending-goldstine-79a4ed.netlify.app/">Deployed App</a> (short note below)
+## Project Overview
 
-(Note: The website can take upto 30 seconds (hosted on Heroku free tier services), as the project has no clients, its just for learning, please refer the source
-code to run locally).
+The application allows users to:
 
-# Table of contents
-- [About_this_App](#About_this_App)
-- [App_Overview](#App_Overview)
-  * [Products_List_Page](#Products_List_Page)
-  * [Product_Details_Page](#Product_Details_Page)
-  * [Product_Edit_Page](#Product_Edit_Page)
-  * [Add_Product_Page](#Add_Product_Page)
-  * [Checkout_Page](#Checkout_Page)
-  * [Payment_Confirmation_Page](#Payment_Confirmation_Page)
-  * [Payment_successfull_Page](#Payment_successfull_Page)
-  * [Orders_Page_For_User](#Orders_Page_For_User)
-  * [Orders_Page_For_Admin](#Orders_Page_For_Admin)
-  * [Address_Settings_Page](#Address_Settings_Page)
-  * [Address_Create_Page](#Address_Create_Page)
-  * [Address_Edit_Page](#Address_Edit_Page)
-  * [Card_Settings_Page](#Card_Settings_Page)
-  * [Card_Update_Page](#Card_Update_Page)
-  * [Login_Page](#Login_Page)
-  * [Register_Page](#Register_Page)
-  * [User_Account_Page](#User_Account_Page)
-  * [Update_User_Account_Page](#Update_User_Account_Page)
-  * [Delete_User_Account_Page](#Delete_User_Account_Page)
-  * [Other_Functionalities](#Other_Functionalities)
-- [Installation](#Installation)
-  * [Backend](#backend)
-  * [Frontend](#frontend)
+- Browse products and view product details
+- Register and log in
+- Manage account information
+- Add, update, and delete addresses
+- Manage payment cards
+- Complete checkout using Stripe
+- View order history
+- Delete their account
+- Use JWT-based authentication
 
-## About_this_App
-An Ecommerce app where users can purchase products by using their stripe card.  Users are allowed to visit our website and free to look any product details. User needs to create an account on our website to proceed with the payment section. If a user want they can also delete their account anytime (NOTE: With the deletion of a user account all their info like Account details, Address details, Card details will be deleted as well)
+Admin users can also:
 
-The website also provides the flexibility to create a new stripe card if they do not have one, the user can also pay with other user stripe card (if they provide the right email address linked with the card and other card details like Card Number, Exp Month, Exp Year and CVC). The user can also detete their stripe card if they like (Caution: With the deletion of their stripe card their account related to that card will also be deleted as well). 
+- Add products
+- Edit product details
+- Delete products
+- View customer orders
+- Update delivery/order status
+- Search orders by customer, address, or product
 
-## App_Overview
-### Products_List_Page
-This page displays all the available products on the website.
-<p align="center">
-  <img src="https://github.com/YashMarmat/Pages-App-django/blob/master/templates/ecommerce%20%20products%20list%20page.png?raw=true" width="100%">
-</p>
+---
 
-### Product_Details_Page
-This page displays the details of the Product which user has selected from the products list page. Here, the user can see all the info of the Product such as product name, description, in stock or out of stock and pay with stripe button. For Admins, the website provides two more functionalities such as Updating the product and secondly deleting the product.
-<p align="center">
-  <img src="https://github.com/YashMarmat/Pages-App-django/blob/master/templates/ecommerce%20%20product%20details%20page.png?raw=true" width="100%">
-</p>
+## DevOps Focus
 
-### Product_Edit_Page
-Only admins can visit this page, the page handles the editing of the Product in terms of image, name , description, price and in stock status. 
-<p align="center">
-  <img src="https://github.com/YashMarmat/Pages-App-django/blob/master/templates/ecommerce%20%20product%20edit%20page.png?raw=true" width="100%">
-</p>
+This project is structured to demonstrate practical DevOps skills including:
 
-### Add_Product_Page
-Only admins can visit this page, the pages handles the creation of product (requires product name,  image, description, price and in stock status.
-<p align="center">
-  <img src="https://github.com/YashMarmat/Pages-App-django/blob/master/templates/ecommerce%20%20add%20product%20page.png?raw=true" width="100%">
-</p>
+- **AWS** cloud deployment
+- **Docker** containerization
+- **CI/CD** automation with GitHub Actions / Jenkins
+- **Linux** server administration
+- **Nginx** web server / reverse proxy configuration
+- **Git & GitHub** version control and collaboration
+- Application deployment and troubleshooting
+- Secure handling of environment variables and secrets
 
-### Checkout_Page
-This page displays the info of the product which user has selected for the purchase. The page Contains the product information and provides pay with stripe card
-option. The user can also save their card for future payments. The user can also select or edit their address from the page.
+---
 
-<p align="center">
-  <img src="https://github.com/YashMarmat/Pages-App-django/blob/master/templates/ecommerce%20%20checkout%20page.png?raw=true" width="100%">
-</p>
+## Tech Stack
 
-### Payment_Confirmation_Page
-The page displays total amount info, the address selected by the user for delivery and the card number used for the purchase. The user can also select a different card and
-address from the same page if something wents wrong.
+### DevOps / Infrastructure
 
-<p align="center">
-  <img src="https://github.com/YashMarmat/Pages-App-django/blob/master/templates/ecommerce%20%20payment%20confirmation%20page.png?raw=true" width="100%">
-</p>
-
-### Payment_Successfull_Page
-The Page displays the confirmation of the product purchase. Also, provides info like which product is bought and how much amount was paid for it. Go to orders page is
-also provided to see the order details.
-
-<p align="center">
-  <img src="https://github.com/YashMarmat/Pages-App-django/blob/master/templates/ecommerce%20%20payment%20successfull%20page.png?raw=true" width="100%">
-</p>
-
-### Orders_Page_For_User
-The page displays the list of all the orders made by user, with the details like their name, card number used, date of purchase, address etc.
-
-<p align="center">
-  <img src="https://github.com/YashMarmat/Pages-App-django/blob/master/templates/ecommerce%20%20orders%20page%20for%20normal%20user.png?raw=true" width="100%">
-</p>
-
-### Orders_Page_For_Admin
-For admin user the page display the list of all users order information. The admin can change the status of product delivery status as well. A search bar is also
-provided to locate the orders with more flexibility (can search the orders by customer name, address and product name)
-
-<p align="center">
-  <img src="https://github.com/YashMarmat/Pages-App-django/blob/master/templates/ecommerce%20%20orders%20page%20for%20admin.png?raw=true" width="100%">
-</p>
-
-### Address_Settings_Page
-Here, the user can view their addresses, the page also provides creation of new address and can edit or delete it as well.
-<p align="center">
-  <img src="https://github.com/YashMarmat/Pages-App-django/blob/master/templates/ecommerce%20%20address%20settings%20page.png?raw=true" width="100%">
-</p>
-
-### Address_Create_Page
-Here, the user can create their new address.
-<p align="center">
-  <img src="https://github.com/YashMarmat/Pages-App-django/blob/master/templates/ecommerce%20%20address%20create%20page.png?raw=true" width="50%">
-</p>
-
-### Address_Edit_Page
-Here, the user can edit their address.
-<p align="center">
-  <img src="https://github.com/YashMarmat/Pages-App-django/blob/master/templates/ecommerce%20%20address%20update%20page.png?raw=true" width="50%">
-</p>
-
-### Card_Settings_Page
-Here, the user can view all their card details. The Page also provides updation and deletion of Card.
-<p align="center">
-  <img src="https://github.com/YashMarmat/Pages-App-django/blob/master/templates/ecommerce%20%20card%20settings%20page.png?raw=true" width="100%">
-</p>
-
-
-### Card_Update_Page
-Here, the user can update their card.
-<p align="center">
-  <img src="https://github.com/YashMarmat/Pages-App-django/blob/master/templates/ecommerce%20%20card%20update%20page.png?raw=true" width="50%">
-</p>
-
-### Login_Page
-Requires an Account on the Website
-<p align="center">
-  <img src="https://github.com/YashMarmat/Pages-App-django/blob/master/templates/ecommerce%20%20sign%20in%20page.png?raw=true" width="100%">
-</p>
-
-### Register_Page
-<p align="center">
-  <img src="https://github.com/YashMarmat/Pages-App-django/blob/master/templates/ecommerce%20%20sign%20up%20page.png?raw=true" width="100%">
-</p>
-
-### User_Account_Page
-Here, the user can see their details like their Name, Email and Admin Priviledges.
-<p align="center">
-  <img src="https://github.com/YashMarmat/Pages-App-django/blob/master/templates/ecommerce%20%20user%20account%20page.png?raw=true" width="100%">
-</p>
-
-### Update_User_Account_Page
-Here, the user can update their account details like username, email and can also reset their password.
-<p align="center">
-  <img src="https://github.com/YashMarmat/Pages-App-django/blob/master/templates/ecommerce%20account%20update%20page.png?raw=true" width="100%">
-</p>
-
-### Delete_User_Account_Page
-Here, the user can Delete their account (requires password confirmation)
-<p align="center">
-  <img src="https://github.com/YashMarmat/Pages-App-django/blob/master/templates/ecommerce%20%20delete%20account%20page.png?raw=true" width="100%">
-</p>
-
-### Other_Functionalities
-- Used JSON web tokens to achieve the authentication checks in the website.
-- Strict Security Checking behind the scenes during the Card Creation and Payment Process.
-- JSON Token gets checked for every single request made on the website (except products list and product details page)
-
-## Installation
-after downloading/cloning the repository code follow below steps:
-* (NOTE: your need to mention your own stripe secret api key and publishable key in django to run the project)
+- AWS
+- Docker
+- GitHub Actions / Jenkins
+- Linux
+- Nginx
+- Git
+- GitHub
 
 ### Backend
-* (for both linux and windows)
-1) Move in backend folder through terminal and run following commands,
 
-`python3 -m venv env` (for windows --> `python -m venv env`) 
-
-`source env/bin/activate` (for windows --> `env\scripts\activate`)
-
-`pip install -r requirements.txt` (same for both)
-
-`python manage.py runserver` (same for both)
+- Python
+- Django
 
 ### Frontend
-* (for both linux and windows)
-2) Move in frontend folder through terminal and run follwing commands
 
-`npm i`
+- React
+- JavaScript
+- npm
 
-`npm start`
+### Authentication & Payments
 
-## All set ! Happy coding :)
+- JSON Web Tokens (JWT)
+- Stripe
 
-<p><a href="#top">Back to Top</a></p>
+---
 
+## High-Level Architecture
+
+```text
+Developer
+   |
+   v
+GitHub Repository
+   |
+   v
+CI/CD Pipeline
+(GitHub Actions / Jenkins)
+   |
+   v
+Docker Build
+   |
+   v
+AWS Deployment Environment
+   |
+   v
+Linux Server
+   |
+   v
+Nginx
+   |
+   v
+Django Backend + React Frontend
+```
+
+> Update this diagram if your actual AWS architecture uses specific services such as EC2, ECS, ECR, RDS, S3, CloudFront, or a load balancer.
+
+---
+
+## CI/CD Workflow
+
+A typical workflow for this project is:
+
+1. Developer pushes code to GitHub.
+2. CI/CD workflow starts automatically.
+3. Application dependencies are installed.
+4. Build and validation steps are executed.
+5. Docker image is built.
+6. Application is deployed to the AWS environment.
+7. Nginx serves or proxies application traffic.
+8. Deployment is verified.
+
+> Keep only the steps that match your actual implementation.
+
+---
+
+## Docker
+
+Docker is used to make the application easier to build and run consistently across environments.
+
+Recommended repository structure:
+
+```text
+.
+├── backend/
+├── frontend/
+├── Dockerfile
+├── docker-compose.yml
+├── .github/
+│   └── workflows/
+├── nginx/
+├── docs/
+│   └── screenshots/
+└── README.md
+```
+
+If your repository uses separate Dockerfiles for frontend and backend, document them here.
+
+---
+
+## AWS Deployment
+
+This project is deployed to AWS as part of the DevOps workflow.
+
+Document your real AWS resources here, for example:
+
+- Compute service used
+- Networking configuration
+- Security groups
+- Container registry, if used
+- Database service, if used
+- Domain / DNS configuration
+- HTTPS / TLS configuration
+- Monitoring and logging
+
+> Do not list AWS services here unless they are actually used in this project.
+
+---
+
+## Nginx
+
+Nginx can be used as a web server and/or reverse proxy in front of the application.
+
+Typical responsibilities include:
+
+- Serving frontend assets
+- Proxying API requests to Django
+- Handling application routing
+- Supporting HTTPS
+- Managing production traffic
+
+Add the relevant Nginx configuration file to the repository if it is part of your deployment.
+
+---
+
+## Security & Secrets
+
+Never commit secrets directly to GitHub.
+
+Keep sensitive values in environment variables or secure secret stores.
+
+Examples:
+
+```env
+DJANGO_SECRET_KEY=
+STRIPE_SECRET_KEY=
+STRIPE_PUBLISHABLE_KEY=
+DATABASE_URL=
+AWS_ACCESS_KEY_ID=
+AWS_SECRET_ACCESS_KEY=
+```
+
+Make sure files such as these are ignored:
+
+```gitignore
+.env
+*.pem
+*.key
+__pycache__/
+node_modules/
+```
+
+If any secret has ever been committed to Git history, rotate it immediately.
+
+---
+
+## Application Features
+
+### Product Management
+
+Users can browse available products and open individual product detail pages.
+
+Admins can:
+
+- Add products
+- Update product information
+- Change stock status
+- Delete products
+
+### Authentication
+
+The application uses JWT-based authentication.
+
+Authentication checks are performed for protected requests, while public product-list and product-detail endpoints can remain accessible without authentication.
+
+### Checkout & Stripe
+
+Users can:
+
+- Select products
+- Manage delivery addresses
+- Add or update Stripe card information
+- Complete payment
+- View payment confirmation
+
+### Orders
+
+Users can view their own orders.
+
+Admins can:
+
+- View all orders
+- Update delivery status
+- Search orders
+
+### Account Management
+
+Users can:
+
+- Update profile information
+- Reset their password
+- Delete their account
+
+---
+
+## Local Development Setup
+
+### 1. Clone the repository
+
+```bash
+git clone <YOUR_REPOSITORY_URL>
+cd <YOUR_REPOSITORY_FOLDER>
+```
+
+---
+
+### 2. Backend Setup
+
+Move into the backend directory:
+
+```bash
+cd backend
+```
+
+Create a virtual environment:
+
+#### Linux / macOS
+
+```bash
+python3 -m venv env
+source env/bin/activate
+```
+
+#### Windows
+
+```bash
+python -m venv env
+env\Scripts\activate
+```
+
+Install dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+Add the required environment variables.
+
+Run the backend:
+
+```bash
+python manage.py runserver
+```
+
+---
+
+### 3. Frontend Setup
+
+Open another terminal and move into the frontend directory:
+
+```bash
+cd frontend
+```
+
+Install dependencies:
+
+```bash
+npm install
+```
+
+Start the frontend:
+
+```bash
+npm start
+```
+
+---
+
+## Screenshots
+
+Replace these placeholders with screenshots from **your own repository/project**.
+
+Recommended screenshots:
+
+1. Application home / products page
+2. GitHub Actions or Jenkins pipeline
+3. Successful Docker build
+4. Running containers
+5. AWS deployment
+6. Nginx configuration / reverse proxy
+7. Final deployed application
+
+Example:
+
+```markdown
+![CI/CD Pipeline](docs/screenshots/cicd-pipeline.png)
+![AWS Deployment](docs/screenshots/aws-deployment.png)
+![Application](docs/screenshots/application.png)
+```
+
+---
+
+## Challenges & Solutions
+
+Use this section to document real engineering problems you faced.
+
+Example format:
+
+### Challenge 1 — Deployment Configuration
+
+**Problem:**  
+Describe the deployment issue.
+
+**Solution:**  
+Explain how you investigated and fixed it.
+
+### Challenge 2 — CI/CD Failure
+
+**Problem:**  
+Describe the pipeline failure.
+
+**Solution:**  
+Explain how you debugged and resolved it.
+
+### Challenge 3 — Nginx / Application Routing
+
+**Problem:**  
+Describe the routing or proxy issue.
+
+**Solution:**  
+Explain the final configuration.
+
+---
+
+## What I Learned
+
+This project helped me strengthen practical skills in:
+
+- Cloud deployment on AWS
+- Docker containerization
+- CI/CD automation
+- Linux server administration
+- Nginx configuration
+- Git and GitHub workflows
+- Django and React deployment
+- Troubleshooting deployment issues
+- Environment-variable and secret management
+- Building a complete application deployment workflow
+
+---
+
+## Future Improvements
+
+Possible next steps:
+
+- Infrastructure as Code with Terraform
+- Kubernetes deployment
+- Prometheus and Grafana monitoring
+- Automated rollback strategy
+- Centralized logging
+- HTTPS automation
+- Automated testing in CI/CD
+- Production-grade secrets management
+
+Only mark these as completed once they are actually implemented.
+
+---
+
+## Repository Checklist
+
+Before featuring this project on LinkedIn, make sure:
+
+- [ ] Repository is public
+- [ ] No secrets, passwords, `.env`, or `.pem` files are committed
+- [ ] README describes the actual implementation
+- [ ] Screenshots belong to this repository/project
+- [ ] CI/CD workflow is included
+- [ ] Docker configuration is included
+- [ ] AWS deployment is documented
+- [ ] Nginx configuration is documented if used
+- [ ] Repository topics are added
+- [ ] Project has a clear description
+- [ ] LinkedIn Featured section links to this repository
+
+---
+
+## Author
+
+**Muhammad Usama Tauqir**
+
+DevOps Engineer Intern  
+AWS | Docker | Kubernetes | Terraform | CI/CD | Linux
+
+- LinkedIn: https://www.linkedin.com/in/muhammad-usama-tauqir/
+- GitHub: `<ADD_YOUR_GITHUB_PROFILE_URL>`
+
+---
+
+## Note
+
+This project is built for learning, hands-on practice, and demonstrating practical full-stack and DevOps skills.
+
+If you use this repository as a portfolio project, keep the documentation aligned with the tools and infrastructure that are actually implemented.
